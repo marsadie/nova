@@ -1,0 +1,12 @@
+{
+  "name": "nova",
+  "version": "1.0.0",
+  "description": "",
+  "main": "options.js",
+  "type": "module",
+  "scripts": {
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {}
+}
