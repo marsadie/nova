@@ -4,9 +4,21 @@
   "description": "",
   "main": "options.js",
   "type": "module",
-  "scripts": {
-  },
+  "scripts": {},
   "author": "",
   "license": "ISC",
-  "dependencies": {}
+  "dependencies": {
+    "candlestick": "0.0.5",
+    "chalk": "^5.2.0",
+    "csvtojson": "^2.0.10",
+    "mongodb": "^5.1.0",
+    "node-cron": "^3.0.2",
+    "node-fetch": "^3.3.0",
+    "technicalindicators": "^3.1.0"
+  },
+  "devDependencies": {
+    "cheerio": "^1.0.0-rc.12",
+    "dotenv": "^16.0.3",
+    "puppeteer": "^19.7.5"
+  }
 }
