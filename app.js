@@ -1,4 +1,4 @@
-import nav from './components/nav.js';
+import nav, { navStyle } from './components/nav.js';
 import stockcard, { cardStyle } from './components/card.js';
 import { dailyChart } from './components/chart.js';
 import { modalStyle } from './components/modal.js';
@@ -8,6 +8,7 @@ const body = document.querySelector('body');
 const app = document.querySelector('#app');
 
 const style = document.createElement('style');
+style.innerHTML += navStyle;
 style.innerHTML += cardStyle
 style.innerHTML += modalStyle;
 document.head.append(style);
@@ -25,18 +26,24 @@ for (const stock of _stocks) {
     })
 }
 
-// rewrite the above code to use Swift UI
-// import SwiftUI
+// rewrite the above code in react native
+
+// import React from 'react';
+// import { StyleSheet, Text, View } from 'react-native';
 //
-// struct ContentView: View {
-//     var body: some View {
-//         Text("Hello, world!")
-//             .padding()
-//     }
+// export default function App() {
+//   return (
+//     <View style={styles.container}>
+//       <Text>Open up App.js to start working on your app!</Text>
+//     </View>
+//   );
 // }
 //
-// struct ContentView_Previews: PreviewProvider {
-//     static var previews: some View {
-//         ContentView()
-//     }
-// }
+// const styles = StyleSheet.create({
+//   container: {
+//     flex: 1,
+//     backgroundColor: '#fff',
+//     alignItems: 'center',
+//     justifyContent: 'center',
+//   },
+// });

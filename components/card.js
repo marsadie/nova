@@ -54,8 +54,12 @@ export const cardStyle = `
         animation: blink-animation 1s steps(2, start) infinite;
         -webkit-animation: blink-animation 1s steps(2, start) infinite;
     }
+    .stock-card .accordion-button:not(.collapsed) {
+        color: #eee;
+    }
     .stock-card .accordion-button {
         background-color: transparent;
+        color: #eee;
     }
     .stock-card .accordion-button:focus {
         box-shadow: none;
@@ -76,9 +80,33 @@ export const cardStyle = `
 `;
 
 const stockcard = async (stock) => {
-    const { ticker, bidDollars, askDollars, yesterdaysClose, iv, rsi } = stock;
+    const { ticker, company, bidDollars, askDollars, yesterdaysClose, iv, rsi } = stock;
     const close = formatter.format(stock.close);
-    const prediction = Math.max(bidDollars, askDollars) - Math.min(bidDollars, askDollars) > 10000000;
+
+    const prediction = () => {
+        const imbalance = Math.max(bidDollars, askDollars) - Math.min(bidDollars, askDollars) > 1000000;
+        const moreSelling = bidDollars < askDollars;
+        const moreBuying = askDollars < bidDollars;
+        const lowIv = iv < 40;
+        const highRsi = rsi > 0;
+        const lowRsi = rsi < 100;
+
+        if (lowIv) {
+            if (imbalance) {
+                if (moreSelling) {
+                    return 'buy puts';
+                } else {
+                    return 'buy calls';
+                }
+            } else {
+                if (moreSelling) {
+                    return 'bearish';
+                } else {
+
+                } return 'bullish';
+            }
+        }
+    }
 
     return new Promise(async (resolve) => {
         resolve(`
@@ -92,7 +120,7 @@ const stockcard = async (stock) => {
                     <div class="right">
                         <h4 class="stockPrice" style="color: ${stock.close > yesterdaysClose ? `#32992d` : `#b23131`}">${close ?? 'err'}</h4>
                         <h5 class="card-subtitle mb-2 text-muted">
-                            ${prediction ? bidDollars > askDollars ? `buy calls` : 'buy puts' : ''}
+                            ${prediction() ?? ''}
                         </h5>
                     </div>
                 </div>
@@ -104,22 +132,22 @@ const stockcard = async (stock) => {
                     <div class="accordion-item">
                         <h2 class="accordion-header" id="headingTwo">
                             <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse${ticker}" aria-expanded="false" aria-controls="collapse${ticker}">
-                                Technicals
+                                ${company}
                             </button>
                         </h2>
                         <div id="collapse${ticker}" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#accordionExample">
                             <div class="accordion-body">
                                 <table class="table table-dark table-striped">
                                     <tbody>
-                                        ${ iv ? `
+                                        ${iv ? `
                                         <tr>
                                             <th scope="row">implied volatility</th>
                                             <td>${iv.toFixed(0)}%</td>
                                         </tr>
-                                        ` : '' }
+                                        ` : ''}
                                         <tr>
                                             <th scope="row">rsi 10</th>
-                                            <td>${rsi}</td>
+                                            <td>${rsi.toFixed(0)}</td>
                                         </tr>
                                     </tbody>
                                 </table>

@@ -71,7 +71,7 @@ const firstCronRun = async () => {
 
 await firstCronRun();
 
-cron.schedule('0/3 9-16 * * 1-5', async () => {
-    log(chalk.yellow.bold('refreshing stocks every 3 minutes'));
+cron.schedule('5 9-15 * * 1-5', async () => {
+    log(chalk.yellow.bold('refreshing...'));
     await firstCronRun();
 });

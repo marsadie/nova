@@ -29,11 +29,9 @@ const getStocks = async () => {
         }),
     });
     const data = await response.json();
-    const documents = data.documents
-    .filter((stock) => Math.max(stock.askDollars, stock.bidDollars) - Math.min(stock.askDollars, stock.bidDollars) > 10000000)
-    .sort((a, b) => (b.askDollars - b.bidDollars) - (a.askDollars - a.bidDollars));
-    return documents.length == 0 ? data.documents
-    .sort((a, b) => a.putIv - b.putIv) : documents;
+    return data.documents
+    .filter((stock) => stock.iv < 40)
+    .sort((a, b) => a.iv - b.iv);
 }
 
 export default getStocks;
