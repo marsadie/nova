@@ -1,6 +1,6 @@
 import nav from './components/nav.js';
 import stockcard, { cardStyle } from './components/card.js';
-import { optionChart } from './components/chart.js';
+import { dailyChart } from './components/chart.js';
 import { modalStyle } from './components/modal.js';
 import stocks from './api.js';
 
@@ -15,17 +15,28 @@ document.head.append(style);
 app.innerHTML += nav();
 
 let _stocks = await stocks();
-//let _stocks = JSON.parse(localStorage.getItem('stocks')) || [];
 
 for (const stock of _stocks) {
     const createCard = stockcard(stock);
     createCard.then(async card => {
         app.innerHTML += card;
-        //const callChart = optionChart(stock);
-        //body.append(document.createRange().createContextualFragment(callChart));
+        const chart = await dailyChart(stock);
+        body.append(document.createRange().createContextualFragment(chart));
     })
 }
-// for (const stock of _stocks.documents) {
-//     const stockchart = await chart(stock);
-//     body.append(document.createRange().createContextualFragment(stockchart));
+
+// rewrite the above code to use Swift UI
+// import SwiftUI
+//
+// struct ContentView: View {
+//     var body: some View {
+//         Text("Hello, world!")
+//             .padding()
+//     }
+// }
+//
+// struct ContentView_Previews: PreviewProvider {
+//     static var previews: some View {
+//         ContentView()
+//     }
 // }

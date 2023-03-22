@@ -1,16 +1,9 @@
 import { formatter } from '../utils/index.js';
 
 export const dailyChart = async (stock) => {
-    const { ticker } = stock;
-    const close = stock.close ? stock.close : [0,1];
-    const volume = stock.volume ? stock.volume : [0,1];
-    const todaysPrice = close[close.length - 1];
-    const yesterdaysPrice = close[close.length - 1];
-    const todaysVolume = volume[volume.length - 1];
-    const yesterdaysVolume = volume[volume.length - 2];
+    const { ticker, chart } = stock;
 
-    const tag = () => {
-        return `
+    const tag = `
         const ${ticker}Chart = new Chart(document.getElementById('${ticker}-chart').getContext('2d'), {
             type: 'line',
             data: {
@@ -19,7 +12,7 @@ export const dailyChart = async (stock) => {
                     label: 'My First dataset',
                     backgroundColor: 'transparent',
                     borderColor: 'rgb(255, 255, 255)',
-                    data: [${close}],
+                    data: [${chart}],
                 }]
             },
             options: {
@@ -59,23 +52,12 @@ export const dailyChart = async (stock) => {
             }
         });
     `;
-    }
 
     return `
-        <script defer>
-            // document.getElementById('${ticker}-chart').addEventListener('load', () => {
-                document.querySelector('.${ticker.toLowerCase()} .stockPrice').innerHTML = '${formatter.format(todaysPrice)}'; 
-                ${tag()};
-                document.querySelector('.${ticker.toLowerCase()} .stockPrice').style = 'color: ${todaysPrice > yesterdaysPrice ? '#54b154' : '#b15454'}';
-                if (${todaysVolume} > ${yesterdaysVolume} && ${todaysPrice} > ${yesterdaysPrice}) {
-                    document.querySelector('.bearish').style = 'display: inline;';
-                } else 
-                if (${todaysVolume} > ${yesterdaysVolume} && ${todaysPrice} < ${yesterdaysPrice}) {
-                    document.querySelector('.bullish').style = 'display: inline;';
-                } else {
-                    console.log('No signal');
-                }
-            // });
+        <script>
+            <!-- document.querySelector('.stock-card.${ticker}').addEventListener('load', () => { -->
+                ${tag}
+            <!-- }); -->
         </script>
     `;
 };

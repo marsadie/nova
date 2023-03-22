@@ -1,6 +1,5 @@
 import { load } from 'cheerio';
 import fetch from 'node-fetch';
-import { RSI } from 'technicalindicators';
 
 const getOptions = async (stock) => {
     const contracts = async (type) => {
@@ -32,20 +31,12 @@ const getOptions = async (stock) => {
             timestamps: callData.chart.result[0].timestamp,
             quotes: callData.chart.result[0].indicators.quote[0],
          } : callData ? callData.chart.error.description : null,
-        callIv: callContract.iv,
-        callRsi: callData && !callData.chart.error ? RSI.calculate({
-            values: callData.chart.result[0].indicators.quote[0].close,
-            period: 2,
-        }) : null,
         putOption: putData && !putData.chart.error ? {
             timestamps: putData.chart.result[0].timestamp,
             quotes: putData.chart.result[0].indicators.quote[0],
          } : putData ? putData.chart.error.description : null,
-        putIv: putContract.iv,
-        putRsi: putData && !putData.chart.error ? RSI.calculate({
-            values: putData.chart.result[0].indicators.quote[0].close,
-            period: 2,
-        }) : null,
+        iv: (Number(callContract.iv.split('%')[0]) + Number(putContract.iv.split('%')[0])) / 2,
+
     }
 }
 

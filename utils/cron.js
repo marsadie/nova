@@ -6,8 +6,6 @@ import { getStocks } from '../jobs/stocks.js';
 import books from '../jobs/books.js';
 import options from '../jobs/options.js';
 import quotes from '../jobs/quotes.js';
-import news from '../jobs/news.js';
-import { getMaxPain } from '../jobs/insights.js';
 
 dotenv.config();
 
@@ -30,23 +28,21 @@ const createDoc = async (stock) => {
     const optionsData = await options(stock.ticker);
     log(chalk.blue(`...Getting quotes for ${stock.ticker}...`));
     const quoteData = await quotes(stock.ticker);
-    log(chalk.blue(`...Getting news for ${stock.ticker}...`));
-    const newsData = await news(stock.ticker);
-    log(chalk.blue(`...Getting max pain for ${stock.ticker}...`));
-    const maxPain = await getMaxPain(stock.ticker);
 
     const { company, sector } = stock;
     const { bidVolume, askVolume, bestBid, bestAsk, bidDollars, askDollars } = bookData;
-    const { callOption, putOption, callIv, putIv, callRsi, putRsi } = optionsData;
-    const { close, volume } = quoteData;
+    const { callOption, putOption, iv } = optionsData;
+    const { close, volume, rsi } = quoteData;
 
     const doc = {
         ticker: stock.ticker,
         company: company,
         sector: sector,
+        chart: close,
         close: close.pop(),
         yesterdaysClose: close[close.length - 2],
         volume: volume.pop() / volume[volume.length - 2],
+        rsi: rsi.pop(),
         bidVolume: bidVolume,
         askVolume: askVolume,
         bidDollars: bidDollars,
@@ -55,31 +51,27 @@ const createDoc = async (stock) => {
         bestAsk: bestAsk,
         callOption: callOption,
         putOption: putOption,
-        callIv: callIv,
-        putIv: putIv,
-        callRsi: callRsi,
-        putRsi: putRsi,
-        maxPain: maxPain,
-        news: newsData,
+        iv: iv,
+        lastUpdated: new Date()
     }
     return doc;
 }
 
-const updateDocs = async () => {
-    //stocksCollection.deleteMany({});
-    stocksCollection.findOneAndDelete({ ticker: { $nin: _stocks.map(stock => stock.ticker) } });
+const firstCronRun = async () => {
+    stocksCollection.deleteMany({});
+    stocksCollection.findOneAndDelete({ ticker: { $nin: _stocks.map(stock => (stock.ticker)) } });
     for (const stock of _stocks) {
         const { ticker } = stock;
         const doc = await createDoc(stock);
-        stocksCollection.updateOne({ ticker: ticker }, { $set: doc }, { upsert: true });
+        stocksCollection.replaceOne({ ticker: ticker }, doc, { upsert: true });
         log(chalk.green.italic('added/updated', ticker))
     }
     return true;
 }
 
-await updateDocs();
+await firstCronRun();
 
 cron.schedule('0/3 9-16 * * 1-5', async () => {
     log(chalk.yellow.bold('refreshing stocks every 3 minutes'));
-    await updateDocs();
+    await firstCronRun();
 });

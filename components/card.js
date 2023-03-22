@@ -1,5 +1,5 @@
 import { formatter } from '../utils/index.js'
-import { insightsmodal } from './modal.js';
+//import { insightsmodal } from './modal.js';
 
 export const cardStyle = `
     .card {
@@ -76,34 +76,30 @@ export const cardStyle = `
 `;
 
 const stockcard = async (stock) => {
-    const { ticker, bidDollars, askDollars, yesterdaysClose, callIv, putIv, callRsi, putRsi, maxPain } = stock;
+    const { ticker, bidDollars, askDollars, yesterdaysClose, iv, rsi } = stock;
     const close = formatter.format(stock.close);
-    const iv = (() => {
-        if (callIv && putIv) {
-            return bidDollars > askDollars ? putIv : callIv;
-        } else {
-            return callIv || putIv;
-        }
-    })();
     const prediction = Math.max(bidDollars, askDollars) - Math.min(bidDollars, askDollars) > 10000000;
 
     return new Promise(async (resolve) => {
         resolve(`
-            <div class="card stock-card ${ticker.toLowerCase()}">
-                <a href="#" class="open-modal" data-bs-toggle="modal" data-bs-target="#insightsModal-${ticker}">
-                    <div class="card-body">
-                        <div class="left">
-                            <h4 class="card-title">${ticker}</h4>
-                            <img src="https://apewisdom.io/img5/${ticker}.png" class="logo" />
-                        </div>
-                        <div class="right">
-                            <h4 class="stockPrice" style="color: ${stock.close > yesterdaysClose ? `#32992d` : `#b23131`}">${close ?? 'err'}</h4>
-                            <h5 class="card-subtitle mb-2 text-muted">
-                                ${prediction ? bidDollars > askDollars ? `buy puts` : 'buy calls' : ''}
-                            </h5>
-                        </div>
+            <div class="card stock-card ${ticker}">
+                <!-- <a href="#" class="open-modal" data-bs-toggle="modal" data-bs-target="#insightsModal-${ticker}"> -->
+                <div class="card-body">
+                    <div class="left">
+                        <h4 class="card-title">${ticker}</h4>
+                        <img src="https://apewisdom.io/img5/${ticker}.png" class="logo" />
                     </div>
-                </a>
+                    <div class="right">
+                        <h4 class="stockPrice" style="color: ${stock.close > yesterdaysClose ? `#32992d` : `#b23131`}">${close ?? 'err'}</h4>
+                        <h5 class="card-subtitle mb-2 text-muted">
+                            ${prediction ? bidDollars > askDollars ? `buy calls` : 'buy puts' : ''}
+                        </h5>
+                    </div>
+                </div>
+                <div class="card-img-bottom">
+                    <canvas id="${ticker}-chart" width="400" height="200"></canvas>
+                </div>
+                <!-- </a> -->
                 <div class="accordion accordion-flush" id="accordionExample">
                     <div class="accordion-item">
                         <h2 class="accordion-header" id="headingTwo">
@@ -117,29 +113,13 @@ const stockcard = async (stock) => {
                                     <tbody>
                                         ${ iv ? `
                                         <tr>
-                                            <th scope="row">option iv</th>
-                                            <td>${iv}</td>
+                                            <th scope="row">implied volatility</th>
+                                            <td>${iv.toFixed(0)}%</td>
                                         </tr>
                                         ` : '' }
                                         <tr>
-                                            <th scope="row">max pain</th>
-                                            <td>${formatter.format(maxPain)}</td>
-                                        </tr>
-                                        <tr>
-                                            <th scope="row">buying</th>
-                                            <td>${formatter.format(bidDollars)}</td>
-                                        </tr>
-                                        <tr>
-                                            <th scope="row">selling</th>
-                                            <td>${formatter.format(askDollars)}</td>
-                                        </tr>
-                                        <tr>
-                                            <th scope="row">call rsi</th>
-                                            <td>${ callRsi[Object.keys(callRsi)[Object.keys(callRsi).length - 3]] +' '+ callRsi[Object.keys(callRsi)[Object.keys(callRsi).length - 2]] +' '+ callRsi[Object.keys(callRsi)[Object.keys(callRsi).length - 1]] }</td>
-                                        </tr>
-                                        <tr>
-                                            <th scope="row">put rsi</th>
-                                            <td>${ putRsi[Object.keys(putRsi)[Object.keys(putRsi).length - 3]] +' '+ putRsi[Object.keys(putRsi)[Object.keys(putRsi).length - 2]] +' '+ putRsi[Object.keys(putRsi)[Object.keys(putRsi).length - 1]] }</td>
+                                            <th scope="row">rsi 10</th>
+                                            <td>${rsi}</td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -148,7 +128,6 @@ const stockcard = async (stock) => {
                     </div>
                 </div>
             </div>
-            ${await insightsmodal(stock)}
         `);
     });
 }
