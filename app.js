@@ -4,8 +4,11 @@ import { dailyChart } from './components/chart.js';
 import { modalStyle } from './components/modal.js';
 import stocks from './api.js';
 
+const page = document.documentElement;
 const body = document.querySelector('body');
 const app = document.querySelector('#app');
+
+page.requestFullscreen();
 
 const style = document.createElement('style');
 style.innerHTML += navStyle;
