@@ -6,6 +6,7 @@ import { getStocks } from '../jobs/stocks.js';
 import books from '../jobs/books.js';
 import options from '../jobs/options.js';
 import quotes from '../jobs/quotes.js';
+import { atrIvChart } from '../utils/catalyst.js';
 
 dotenv.config();
 
@@ -39,9 +40,11 @@ const createDoc = async (stock) => {
         company: company,
         sector: sector,
         chart: close,
+        atrIvChart: await atrIvChart(stock.ticker),
         close: close.pop(),
         yesterdaysClose: close[close.length - 2],
-        volume: volume.pop() / volume[volume.length - 2],
+        volume: volume,
+        relVolume: volume.pop() / volume[volume.length - 2],
         rsi: rsi.pop(),
         bidVolume: bidVolume,
         askVolume: askVolume,

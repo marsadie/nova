@@ -29,9 +29,9 @@ const getStocks = async () => {
         }),
     });
     const data = await response.json();
-    return data.documents
-    .filter((stock) => stock.iv < 40)
-    .sort((a, b) => a.iv - b.iv);
+    const filtered = data.documents
+    .filter((stock) => stock.atrIvChart.atr.pop() > stock.atrIvChart.iv.pop());
+    return filtered;
 }
 
 export default getStocks;

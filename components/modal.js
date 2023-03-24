@@ -16,10 +16,6 @@ export const modalStyle = `
         border-radius: 30px;
         padding-bottom: 15px;
     }
-    .modal-body ul.news {
-        list-style-type: none;
-        padding: 0;
-    }
     .modal-body li a {
         color: #eee;
         font-weight: bold;
@@ -30,19 +26,6 @@ export const modalStyle = `
 }`;
 
 export const insightsmodal = async (stock) => {
-    const { ticker, company, news } = stock;
-    const newsList = news.items.slice(0, 3).map((item) => {
-        return `
-            <li>
-                <p>
-                    <a href="${item.url}" target="_blank">${item.title}</a><br />
-                    ${new Date(item.date).toLocaleString()}<br />
-                    <em>${item.source}</em>
-                </p>
-            </li>
-        `;
-    }).join('');
-
     return `
         <div class="modal fade" id="insightsModal-${ticker}" tabindex="-1" aria-labelledby="insightsModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-dialog-scrollable">
@@ -52,8 +35,8 @@ export const insightsmodal = async (stock) => {
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        <ul class="news">
-                            ${newsList}
+                        <ul>
+                            <div id="${ticker}-iv-chart" width="400" height="200"></div>
                         </ul>
                     </div>
                     <!-- <div class="modal-footer">

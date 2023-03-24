@@ -55,15 +55,16 @@ export const dailyChart = async (stock) => {
 
     return `
         <script>
-            <!-- document.querySelector('.stock-card.${ticker}').addEventListener('load', () => { -->
-                ${tag}
-            <!-- }); -->
+            ${tag}
         </script>
     `;
 };
 
-export const optionChart = (stock) => {
-    const { ticker, callOption, putOption } = stock;
+export const atrIvChart = (stock) => {
+    const { atrIvChart, ticker } = stock;
+    let { atr, iv } = atrIvChart;
+    atr = atr.slice(-7);
+    iv = iv.slice(-7);
     return `
         <script defer>
             google.charts.load('current', {
@@ -73,19 +74,30 @@ export const optionChart = (stock) => {
 
             function drawChart() {
                 var data = google.visualization.arrayToDataTable([
-                    ['Day', 'Call', 'Put'],
-                    ${callOption && putOption ? callOption.timestamps.map((timestamp, i) => {
-                        const putClose = putOption.quotes.close.find((c, i) => i === putOption.timestamps.indexOf(timestamp));
-                        return `[${new Date(timestamp * 1000).getDate().toString()}, ${callOption.quotes.close[i]}, ${putClose}]`;
-                    }) : []},
+                    ['Time', 'ATR', 'IV'],
+                    ${atr.map((atr, i) => (`[${i}, ${atr}, ${iv[i]}]`)).join(',')}
                 ]);
 
                 var options = {
-                    curveType: 'function',
-                    legend: { position: 'bottom' }
+                    curveType: 'none',
+                    backgroundColor: 'transparent',
+                    textStyle: { color: '#eee' },
+                    hAxis: {
+                        baselineColor: 'transparent',
+                        gridlines: { count: 0 },
+                        ticks: [],
+                        textStyle: { color: '#eee' }
+                    },
+                    vAxis: {
+                        baselineColor: 'transparent',
+                        gridlines: { count: 0 },
+                        ticks: [],
+                        textStyle: { color: '#eee' }
+                    },
+                    legend: { position: 'bottom', color: '#eee', textStyle: { color: '#eee' } },
                 };
 
-                var chart = new google.visualization.LineChart(document.getElementById('${ticker}-chart'));
+                var chart = new google.visualization.LineChart(document.getElementById('${ticker}-iv-chart'));
 
                 chart.draw(data, options);
             }
