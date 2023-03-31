@@ -8,6 +8,6 @@ export const formatter = new Intl.NumberFormat('en-US', {
 
 export const prediction = (occ) => {
     const strike = formatter.format(Number(occ.slice(-6, -1)) / 100);
-    const type = occ.split('  ')[1].includes('C') ? 'call' : 'put';
+    const type = occ.slice(-15).includes('C') ? 'call' : 'put';
     return `${strike} ${type}s`;
 }

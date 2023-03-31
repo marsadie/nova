@@ -51,19 +51,9 @@ export const cardStyle = `
         top: 10px;
         left: 5px;
     }
-    .stock-card .text-muted {
+    .stock-card .card-subtitle.text-mutedd {
         animation: blink-animation 1s steps(2, start) infinite;
         -webkit-animation: blink-animation 1s steps(2, start) infinite;
-    }
-    .stock-card .accordion-button:not(.collapsed) {
-        color: #eee;
-    }
-    .stock-card .accordion-button {
-        background-color: transparent;
-        color: #eee;
-    }
-    .stock-card .accordion-button:focus {
-        box-shadow: none;
     }
     @keyframes blink-animation {
         to {
@@ -77,6 +67,16 @@ export const cardStyle = `
     }
     .stock-card .card-img-bottom {
         margin-top: 15px;
+    }
+    .stock-card .accordion-button:not(.collapsed) {
+        color: #eee;
+    }
+    .stock-card .accordion-button {
+        background-color: transparent;
+        color: #eee;
+    }
+    .stock-card .accordion-button:focus {
+        box-shadow: none;
     }
 `;
 
@@ -99,7 +99,7 @@ const stockcard = async (stock) => {
                             <h5 class="card-subtitle mb-2 text-muted">
                                 ${prediction(occ)}
                             </h5>
-                            <p class="card-text">${delta ? `Δ: ${formatter.format(delta)}` : ''} ${theta ? `Θ: ${formatter.format(theta)}` : ''} ${bidPrice ? `${formatter.format(bidPrice)}` : ''}/${askPrice ? `${formatter.format(askPrice)}` : ''}</p>
+                            <p class="card-text small text-muted"><em>${delta ? `Δ: ${formatter.format(delta)}` : ''} ${theta ? `Θ: ${formatter.format(theta)}` : ''} ${bidPrice ? `${formatter.format(bidPrice)}` : ''}/${askPrice ? `${formatter.format(askPrice)}` : ''}</em></p>
                         </div>
                     </div>
                     <div class="card-img-bottom">

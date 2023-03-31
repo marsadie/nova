@@ -29,9 +29,8 @@ const getStocks = async () => {
         }),
     });
     const data = await response.json();
-    console.log(data.documents.map(stock => (stock.ticker + stock.relVolume)));
     const sorted = data.documents
-        .filter(stock => stock.relVolume > 1 && stock.bidPrice > 0 && Math.abs(stock.delta) > Math.abs(stock.theta))
+        .filter(stock => (stock.relVolume > 1 && stock.bidPrice > 0 && Math.abs(stock.delta) > Math.abs(stock.theta)))
         .sort((a, b) => (b.relVolume - a.relVolume));
     return sorted;
 }
