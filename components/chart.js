@@ -55,7 +55,7 @@ export const dailyChart = async (stock) => {
         <script defer>
             setTimeout(() => {
                 ${tag}
-            }, 750);
+            }, 1200);
         </script>
     `;
 };

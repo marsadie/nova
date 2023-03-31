@@ -41,7 +41,7 @@ export const insightsModal = async (stock) => {
                     </div>
                     <div class="modal-body">
                         <p>
-                            <img src="https://charts-node.finviz.com/chart.ashx?cs=l&t=${ticker}&tf=h&s=linear&ct=candle_stick&o[0][ot]=patterns&o[0][op]=&o[0][oc]=69C1EAFF" class="finviz-chart" />
+                            <!-- <img src="https://charts-node.finviz.com/chart.ashx?cs=l&t=${ticker}&tf=h&s=linear&ct=candle_stick&o[0][ot]=patterns&o[0][op]=&o[0][oc]=69C1EAFF" class="finviz-chart" /> -->
                         </p>
                         <table class="table table-dark table-striped">
                                     <tbody>

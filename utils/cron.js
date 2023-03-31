@@ -31,8 +31,8 @@ const createDoc = async (stock) => {
     const quoteData = await quotes(stock.ticker);
 
     const { company, sector } = stock;
-    const { bidVolume, askVolume, bestBid, bestAsk, bidDollars, askDollars } = bookData;
-    const { iv, occ, openInterest, delta, theta, bidPrice, askPrice } = optionsData;
+    const { bidVolume, askVolume, bidDollars, askDollars } = bookData;
+    const { iv, occ, openInterest, averageOI, delta, theta, bidPrice, askPrice } = optionsData;
     const { close, volume, rsi } = quoteData;
 
     const doc = {
@@ -50,10 +50,9 @@ const createDoc = async (stock) => {
         askVolume: askVolume,
         bidDollars: bidDollars,
         askDollars: askDollars,
-        bestBid: bestBid,
-        bestAsk: bestAsk,
         occ: occ,
         openInterest: openInterest,
+        averageOI: averageOI,
         delta: delta,
         theta: theta,
         bidPrice: bidPrice,

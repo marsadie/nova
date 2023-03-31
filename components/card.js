@@ -17,13 +17,13 @@ export const cardStyle = `
     .stock-card .left {
         display: inline-block;
         vertical-align: top;
-        width: 36%;
+        width: 34%;
     }
     .stock-card .right {
         display: inline-block;
         text-align: right;
         vertical-align: top;
-        width: 62%;
+        width: 64%;
     }
     .stock-card h4 {
         font-size: 1.5rem;
@@ -81,7 +81,7 @@ export const cardStyle = `
 `;
 
 const stockcard = async (stock) => {
-    const { ticker, company, occ, yesterdaysClose, delta, theta, bidPrice, askPrice } = stock;
+    const { ticker, company, occ, yesterdaysClose, delta, theta, bidPrice, askPrice, relVolume, bidDollars, askDollars } = stock;
     const close = formatter.format(stock.close);
     const news = await getNews(ticker);
 
@@ -99,7 +99,9 @@ const stockcard = async (stock) => {
                             <h5 class="card-subtitle mb-2 text-muted">
                                 ${prediction(occ)}
                             </h5>
-                            <p class="card-text small text-muted"><em>${delta ? `Δ: ${formatter.format(delta)}` : ''} ${theta ? `Θ: ${formatter.format(theta)}` : ''} ${bidPrice ? `${formatter.format(bidPrice)}` : ''}/${askPrice ? `${formatter.format(askPrice)}` : ''}</em></p>
+                            <p class="card-text small text-muted">
+                                ${bidDollars > askDollars + 20000000 ? 'heavy selling' : askDollars > bidDollars + 20000000 ? 'heavy buying' : ''}
+                            </p>
                         </div>
                     </div>
                     <div class="card-img-bottom">

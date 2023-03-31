@@ -29,10 +29,12 @@ const getStocks = async () => {
         }),
     });
     const data = await response.json();
-    const sorted = data.documents
-        .filter(stock => (stock.relVolume > 1 && stock.bidPrice > 0 && Math.abs(stock.delta) > Math.abs(stock.theta)))
-        .sort((a, b) => (b.relVolume - a.relVolume));
-    return sorted;
+    const filtered = data.documents
+        .filter(stock => (stock.bidPrice > 0 && Math.abs(stock.delta) > Math.abs(stock.theta)));
+    console.log(filtered
+        .sort((a, b) => ((b.openInterest - b.averageOI) - (a.openInterest - a.averageOI))).map(stock => ({ stock: stock.ticker, diff: stock.openInterest - stock.averageOI })));
+    return filtered
+        .sort((a, b) => ((b.openInterest - b.averageOI) - (a.openInterest - a.averageOI)));
 }
 
 export default getStocks;

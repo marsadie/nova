@@ -58,11 +58,13 @@ const getOptionsRobinhood = async (stock) => {
         }
     });
     const optionsData = await optionsResponse.json();
+    const averageOI = optionsData.results.reduce((acc, option) => acc + option.open_interest, 0) / optionsData.results.length;
     const highestOIOption = optionsData.results.sort((a, b) => b.open_interest - a.open_interest)[0];
     return {
         iv: highestOIOption.implied_volatility,
         occ: highestOIOption.occ_symbol,
         openInterest: highestOIOption.open_interest,
+        averageOI: averageOI,
         delta: highestOIOption.delta,
         theta: highestOIOption.theta,
         price: highestOIOption.high_fill_rate_buy_price,
