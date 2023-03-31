@@ -1,7 +1,7 @@
 export const navStyle = `
 `;
 
-const nav = () => {
+const nav = (() => {
     return `
     <nav class="navbar navbar-dark bg-dark">
         <div class="container-fluid">
@@ -13,6 +13,6 @@ const nav = () => {
         </div>
     </nav>
     `;
-}
+})();
 
 export default nav;

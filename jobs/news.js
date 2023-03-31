@@ -1,4 +1,4 @@
-import fetch from 'node-fetch';
+//import fetch from 'node-fetch';
 
 //const altNewsLink = `https://www.nasdaq.com/feed/rssoutbound?symbol=${stock}`;
 // https://www.npmjs.com/package/rss-to-json

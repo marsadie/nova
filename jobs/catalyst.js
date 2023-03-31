@@ -12,11 +12,18 @@ export const volumeChange = (thisp, lastp) => (thisp.v * 100) / lastp.v;
 export const getTechnicals = async (ticker) => {
     const response = await fetch(`https://query1.finance.yahoo.com/v8/finance/chart/${ticker}?region=US&lang=en-US&includePrePost=false&interval=1d&useYfid=true&range=1y&corsDomain=finance.yahoo.com&.tsrc=finance`);
     const data = await response.json();
+    const timestamps = data.chart.result[0].timestamp;
     const highPrices = data.chart.result[0].indicators.quote[0].high;
     const closePrices = data.chart.result[0].indicators.adjclose[0].adjclose;
     const lowPrices = data.chart.result[0].indicators.quote[0].low;
-    const atr = ATR.calculate({ high: highPrices, low: lowPrices, close: closePrices, period: 2 });
-    const rsi = RSI.calculate({ values: closePrices, period: 2 });
+    const atr = ATR.calculate({ high: highPrices, low: lowPrices, close: closePrices, period: 2 }).map((atr, i) => ({
+        date: new Date(timestamps[i + 2] * 1000),
+        value: atr,
+    }));
+    const rsi = RSI.calculate({ values: closePrices, period: 2 }).map((rsi, i) => ({
+        date: new Date(timestamps[i + 2] * 1000),
+        value: rsi,
+    }));
     atr.pop();
     rsi.pop();
     return { atr, rsi };
@@ -32,13 +39,14 @@ export const getIv = async (ticker) => {
 export const atrIvChart = async (ticker) => {
     const { atr } = await getTechnicals(ticker);
     const iv = await getIv(ticker);
-    const maxAtrValue = Math.max(...atr);
-    const minAtrValue = Math.min(...atr);
-    const atrScale = atr.map((item) => ((item - minAtrValue) / (maxAtrValue - minAtrValue)));
+    const maxAtrValue = Math.max(...atr.map((item) => item.value));
+    const minAtrValue = Math.min(...atr.map((item) => item.value));
+    const atrScale = atr.map((item) => ((item.value - minAtrValue) / (maxAtrValue - minAtrValue)));
     const maxIvValue = Math.max(...iv);
     const minIvValue = Math.min(...iv);
     const ivScale = iv.map((item) => ((item - minIvValue) / (maxIvValue - minIvValue)));
     return {
+        date: atr.map((item) => item.date),
         atr: atrScale,
         iv: ivScale,
     }

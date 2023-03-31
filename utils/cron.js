@@ -6,7 +6,7 @@ import { getStocks } from '../jobs/stocks.js';
 import books from '../jobs/books.js';
 import options from '../jobs/options.js';
 import quotes from '../jobs/quotes.js';
-import { atrIvChart } from '../utils/catalyst.js';
+import { atrIvChart } from '../jobs/catalyst.js';
 
 dotenv.config();
 
@@ -32,7 +32,7 @@ const createDoc = async (stock) => {
 
     const { company, sector } = stock;
     const { bidVolume, askVolume, bestBid, bestAsk, bidDollars, askDollars } = bookData;
-    const { callOption, putOption, iv } = optionsData;
+    const { iv, occ, openInterest, delta, theta, bidPrice, askPrice } = optionsData;
     const { close, volume, rsi } = quoteData;
 
     const doc = {
@@ -52,8 +52,12 @@ const createDoc = async (stock) => {
         askDollars: askDollars,
         bestBid: bestBid,
         bestAsk: bestAsk,
-        callOption: callOption,
-        putOption: putOption,
+        occ: occ,
+        openInterest: openInterest,
+        delta: delta,
+        theta: theta,
+        bidPrice: bidPrice,
+        askPrice: askPrice,
         iv: iv,
         lastUpdated: new Date()
     }

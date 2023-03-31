@@ -1,5 +1,3 @@
-import { formatter } from '../utils/index.js';
-
 export const dailyChart = async (stock) => {
     const { ticker, chart } = stock;
 
@@ -54,7 +52,7 @@ export const dailyChart = async (stock) => {
     `;
 
     return `
-        <script>
+        <script defer>
             ${tag}
         </script>
     `;
@@ -62,9 +60,10 @@ export const dailyChart = async (stock) => {
 
 export const atrIvChart = (stock) => {
     const { atrIvChart, ticker } = stock;
-    let { atr, iv } = atrIvChart;
-    atr = atr.slice(-7);
-    iv = iv.slice(-7);
+    let { date, atr, iv } = atrIvChart;
+    date = date.slice(-14);
+    atr = atr.slice(-14);
+    iv = iv.slice(-14);
     return `
         <script defer>
             google.charts.load('current', {
@@ -75,7 +74,7 @@ export const atrIvChart = (stock) => {
             function drawChart() {
                 var data = google.visualization.arrayToDataTable([
                     ['Time', 'ATR', 'IV'],
-                    ${atr.map((atr, i) => (`[${i}, ${atr}, ${iv[i]}]`)).join(',')}
+                    ${date.map((d, i) => (`[${d}, ${atr[i]}, ${iv[i]}]`)).join(',')}
                 ]);
 
                 var options = {
@@ -94,7 +93,7 @@ export const atrIvChart = (stock) => {
                         ticks: [],
                         textStyle: { color: '#eee' }
                     },
-                    legend: { position: 'bottom', color: '#eee', textStyle: { color: '#eee' } },
+                    legend: { position: 'bottom', color: '#eee', textStyle: { color: '#eee' }, chartArea: { left: '0', width: '100%' } },
                 };
 
                 var chart = new google.visualization.LineChart(document.getElementById('${ticker}-iv-chart'));

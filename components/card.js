@@ -1,5 +1,6 @@
-import { formatter } from '../utils/index.js'
-//import { insightsmodal } from './modal.js';
+import { formatter, prediction } from '../utils/index.js';
+import getNews from '../jobs/news.js';
+import { insightsModal } from './modal.js';
 
 export const cardStyle = `
     .card {
@@ -50,7 +51,7 @@ export const cardStyle = `
         top: 10px;
         left: 5px;
     }
-    .stock-card .max-pain {
+    .stock-card .text-muted {
         animation: blink-animation 1s steps(2, start) infinite;
         -webkit-animation: blink-animation 1s steps(2, start) infinite;
     }
@@ -80,54 +81,31 @@ export const cardStyle = `
 `;
 
 const stockcard = async (stock) => {
-    const { ticker, company, bidDollars, askDollars, yesterdaysClose, iv, rsi } = stock;
+    const { ticker, company, occ, yesterdaysClose, delta, theta, bidPrice, askPrice } = stock;
     const close = formatter.format(stock.close);
-
-    const prediction = () => {
-        const imbalance = Math.max(bidDollars, askDollars) - Math.min(bidDollars, askDollars) > 1000000;
-        const moreSelling = bidDollars < askDollars;
-        const moreBuying = askDollars < bidDollars;
-        const lowIv = iv < 40;
-        const highRsi = rsi > 0;
-        const lowRsi = rsi < 100;
-
-        if (lowIv) {
-            if (imbalance) {
-                if (moreSelling) {
-                    return 'buy puts';
-                } else {
-                    return 'buy calls';
-                }
-            } else {
-                if (moreSelling) {
-                    return 'bearish';
-                } else {
-
-                } return 'bullish';
-            }
-        }
-    }
+    const news = await getNews(ticker);
 
     return new Promise(async (resolve) => {
         resolve(`
             <div class="card stock-card ${ticker}">
-                <!-- <a href="#" class="open-modal" data-bs-toggle="modal" data-bs-target="#insightsModal-${ticker}"> -->
-                <div class="card-body">
-                    <div class="left">
-                        <h4 class="card-title">${ticker}</h4>
-                        <img src="https://apewisdom.io/img5/${ticker}.png" class="logo" />
+                <a href="#" class="open-modal" data-bs-toggle="modal" data-bs-target="#insightsModal-${ticker}">
+                    <div class="card-body">
+                        <div class="left">
+                            <h4 class="card-title">${ticker}</h4>
+                            <img src="https://apewisdom.io/img5/${ticker}.png" class="logo" />
+                        </div>
+                        <div class="right">
+                            <h4 class="stockPrice" style="color: ${stock.close > yesterdaysClose ? `#32992d` : `#b23131`}">${close ?? 'err'}</h4>
+                            <h5 class="card-subtitle mb-2 text-muted">
+                                ${prediction(occ)}
+                            </h5>
+                            <p class="card-text">${delta ? `Δ: ${formatter.format(delta)}` : ''} ${theta ? `Θ: ${formatter.format(theta)}` : ''} ${bidPrice ? `${formatter.format(bidPrice)}` : ''}/${askPrice ? `${formatter.format(askPrice)}` : ''}</p>
+                        </div>
                     </div>
-                    <div class="right">
-                        <h4 class="stockPrice" style="color: ${stock.close > yesterdaysClose ? `#32992d` : `#b23131`}">${close ?? 'err'}</h4>
-                        <h5 class="card-subtitle mb-2 text-muted">
-                            ${prediction() ?? ''}
-                        </h5>
+                    <div class="card-img-bottom">
+                        <canvas id="${ticker}-chart" width="400" height="200"></canvas>
                     </div>
-                </div>
-                <div class="card-img-bottom">
-                    <canvas id="${ticker}-chart" width="400" height="200"></canvas>
-                </div>
-                <!-- </a> -->
+                </a>
                 <div class="accordion accordion-flush" id="accordionExample">
                     <div class="accordion-item">
                         <h2 class="accordion-header" id="headingTwo">
@@ -137,25 +115,17 @@ const stockcard = async (stock) => {
                         </h2>
                         <div id="collapse${ticker}" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#accordionExample">
                             <div class="accordion-body">
-                                <table class="table table-dark table-striped">
-                                    <tbody>
-                                        ${iv ? `
-                                        <tr>
-                                            <th scope="row">implied volatility</th>
-                                            <td>${iv.toFixed(0)}%</td>
-                                        </tr>
-                                        ` : ''}
-                                        <tr>
-                                            <th scope="row">rsi 10</th>
-                                            <td>${rsi.toFixed(0)}</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
+                                <ul class="list-group list-group-flush">
+                                    ${news.items.slice(0, 3).map((article) => {
+                                        return `<li class="list-group-item"><a href="${article.url}" target="_blank">${article.title}</a></li>`;
+                                    })}
+                                </ul>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
+            ${await insightsModal(stock)}
         `);
     });
 }
