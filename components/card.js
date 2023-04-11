@@ -4,7 +4,7 @@ import { insightsModal } from './modal.js';
 
 export const cardStyle = `
     .card {
-        background-color: #212529;
+        background-color: rgba(33,37,41,0.8);
         border-radius: 30px;
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
         color: #eee;
@@ -68,6 +68,9 @@ export const cardStyle = `
     .stock-card .card-img-bottom {
         margin-top: 15px;
     }
+    .stock-card .accordion-item {
+        background-color: rgba(33,37,41,0.8);
+    }
     .stock-card .accordion-button:not(.collapsed) {
         color: #eee;
     }
@@ -81,8 +84,9 @@ export const cardStyle = `
 `;
 
 const stockcard = async (stock) => {
-    const { ticker, company, occ, yesterdaysClose, delta, theta, bidPrice, askPrice, relVolume, bidDollars, askDollars } = stock;
+    const { ticker, company, occ, openInterest, optionCallsOpenInterest, optionPutsOpenInterest, yesterdaysClose, bidDollars, askDollars } = stock;
     const close = formatter.format(stock.close);
+    const { string: forecast, hot } = prediction(occ, openInterest, optionCallsOpenInterest, optionPutsOpenInterest, bidDollars, askDollars);
     const news = await getNews(ticker);
 
     return new Promise(async (resolve) => {
@@ -97,11 +101,9 @@ const stockcard = async (stock) => {
                         <div class="right">
                             <h4 class="stockPrice" style="color: ${stock.close > yesterdaysClose ? `#32992d` : `#b23131`}">${close ?? 'err'}</h4>
                             <h5 class="card-subtitle mb-2 text-muted">
-                                ${prediction(occ)}
+                                // bootstrap flame icon
+                                ${hot ? `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-flame" viewBox="0 0 16 16">` : ''} ${forecast}
                             </h5>
-                            <p class="card-text small text-muted">
-                                ${bidDollars > askDollars + 20000000 ? 'heavy selling' : askDollars > bidDollars + 20000000 ? 'heavy buying' : ''}
-                            </p>
                         </div>
                     </div>
                     <div class="card-img-bottom">

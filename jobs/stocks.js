@@ -28,7 +28,7 @@ export const getStocks = async () => {
     });
     const data = await response.text();
     const json = await csv().fromString(data);
-    const stocks = json.map(stock => (stock['Ticker'])).concat(activeOptionsStocks);
+    const stocks = activeOptionsStocks.concat(['QQQ', 'SPY']); //json.map(stock => (stock['Ticker'])).concat(activeOptionsStocks);
     const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
     await delay(1000);
     const response2 = await fetch(`https://elite.finviz.com/export.ashx?v=111&ft=4&t=${stocks.join(',')}&auth=marsadie@gmail.com`, {

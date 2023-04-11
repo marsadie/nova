@@ -58,9 +58,15 @@ const getOptionsRobinhood = async (stock) => {
         }
     });
     const optionsData = await optionsResponse.json();
+    const optionCalls = optionsData.results.filter(option => option.occ_symbol.includes('C0'));
+    const optionPuts = optionsData.results.filter(option => option.occ_symbol.includes('P0'));
+    const optionCallsOITotal = optionCalls.reduce((acc, option) => acc + option.open_interest, 0);
+    const optionPutsOITotal = optionPuts.reduce((acc, option) => acc + option.open_interest, 0);
     const averageOI = optionsData.results.reduce((acc, option) => acc + option.open_interest, 0) / optionsData.results.length;
     const highestOIOption = optionsData.results.sort((a, b) => b.open_interest - a.open_interest)[0];
     return {
+        optionCallsOpenInterest: optionCallsOITotal,
+        optionPutsOpenInterest: optionPutsOITotal,
         iv: highestOIOption.implied_volatility,
         occ: highestOIOption.occ_symbol,
         openInterest: highestOIOption.open_interest,

@@ -1,5 +1,5 @@
 import fetch from 'node-fetch';
-import { ATR, RSI } from 'technicalindicators';
+import { MFI, RSI } from 'technicalindicators';
 
 // biggest change candle (+/-)
 // biggest volume increase
@@ -16,17 +16,16 @@ export const getTechnicals = async (ticker) => {
     const highPrices = data.chart.result[0].indicators.quote[0].high;
     const closePrices = data.chart.result[0].indicators.adjclose[0].adjclose;
     const lowPrices = data.chart.result[0].indicators.quote[0].low;
-    const atr = ATR.calculate({ high: highPrices, low: lowPrices, close: closePrices, period: 2 }).map((atr, i) => ({
+    const volume = data.chart.result[0].indicators.quote[0].volume;
+    const mfi = MFI.calculate({ high: highPrices, low: lowPrices, close: closePrices, volume: volume, period: 7 }).map((mfi, i) => ({
         date: new Date(timestamps[i + 2] * 1000),
-        value: atr,
+        value: mfi,
     }));
-    const rsi = RSI.calculate({ values: closePrices, period: 2 }).map((rsi, i) => ({
+    const rsi = RSI.calculate({ values: closePrices, period: 7 }).map((rsi, i) => ({
         date: new Date(timestamps[i + 2] * 1000),
         value: rsi,
     }));
-    atr.pop();
-    rsi.pop();
-    return { atr, rsi };
+    return { mfi, rsi };
 }
 
 export const getIv = async (ticker) => {
@@ -36,18 +35,17 @@ export const getIv = async (ticker) => {
     return data.slice(-length).map((d) => d.value);
 }
 
-export const atrIvChart = async (ticker) => {
-    const { atr } = await getTechnicals(ticker);
-    const iv = await getIv(ticker);
-    const maxAtrValue = Math.max(...atr.map((item) => item.value));
-    const minAtrValue = Math.min(...atr.map((item) => item.value));
-    const atrScale = atr.map((item) => ((item.value - minAtrValue) / (maxAtrValue - minAtrValue)));
-    const maxIvValue = Math.max(...iv);
-    const minIvValue = Math.min(...iv);
-    const ivScale = iv.map((item) => ((item - minIvValue) / (maxIvValue - minIvValue)));
+export const mfiRsiChart = async (ticker) => {
+    const { mfi, rsi } = await getTechnicals(ticker);
+    const maxMfiValue = Math.max(...mfi.map((item) => item.value));
+    const minMfiValue = Math.min(...mfi.map((item) => item.value));
+    const mfiScale = mfi.map((item) => ((item.value - minMfiValue) / (maxMfiValue - minMfiValue)));
+    const maxRsiValue = Math.max(...rsi.map((item) => item.value));
+    const minRsiValue = Math.min(...rsi.map((item) => item.value));
+    const rsiScale = rsi.map((item) => ((item - minRsiValue) / (maxRsiValue - minRsiValue)));
     return {
-        date: atr.map((item) => item.date),
-        atr: atrScale,
-        iv: ivScale,
+        date: mfi.map((item) => item.date),
+        mfi: mfiScale,
+        rsi: rsiScale,
     }
 }

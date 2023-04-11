@@ -60,12 +60,12 @@ export const dailyChart = async (stock) => {
     `;
 };
 
-export const atrIvChart = (stock) => {
-    const { atrIvChart, ticker } = stock;
-    let { date, atr, iv } = atrIvChart;
+export const mfiRsiChart = (stock) => {
+    const { mfiRsiChart, ticker } = stock;
+    let { date, mfi, rsi } = mfiRsiChart;
     date = date.slice(-14);
-    atr = atr.slice(-14);
-    iv = iv.slice(-14);
+    mfi = mfi.slice(-14);
+    rsi = rsi.slice(-14);
     return `
         <script defer>
             google.charts.load('current', {
@@ -75,8 +75,8 @@ export const atrIvChart = (stock) => {
 
             function drawChart() {
                 var data = google.visualization.arrayToDataTable([
-                    ['Time', 'ATR', 'IV'],
-                    ${date.map((d, i) => (`[${d}, ${atr[i]}, ${iv[i]}]`)).join(',')}
+                    ['Time', 'MFI', 'RSI'],
+                    ${date.map((d, i) => (`[${d}, ${mfi[i]}, ${rsi[i]}]`)).join(',')}
                 ]);
 
                 var options = {
@@ -98,7 +98,7 @@ export const atrIvChart = (stock) => {
                     legend: { position: 'bottom', color: '#eee', textStyle: { color: '#eee' }, chartArea: { left: '0', width: '100%' } },
                 };
 
-                var chart = new google.visualization.LineChart(document.getElementById('${ticker}-iv-chart'));
+                var chart = new google.visualization.LineChart(document.getElementById('${ticker}-rsi-chart'));
 
                 chart.draw(data, options);
             }

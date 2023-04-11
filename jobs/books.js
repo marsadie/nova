@@ -18,6 +18,8 @@ const getBooks = async (stock) => {
     const askDollars = books.map((book) => book.data.asks.map((ask) => ask[0] * ask[1] * 100)).flat().reduce((a, b) => a + b, 0);
     const bidVolume = books.map((book) => book.data.bids.map((bid) => bid[0] * 100)).flat().reduce((a, b) => a + b, 0);
     const askVolume = books.map((book) => book.data.asks.map((ask) => ask[0] * 100)).flat().reduce((a, b) => a + b, 0);
+    const largestBidVolume = books.map((book) => book.data.bids.map((bid) => bid[0])).flat().reduce((a, b) => Math.max(a, b), 0);
+    const largestAskVolume = books.map((book) => book.data.asks.map((ask) => ask[0])).flat().reduce((a, b) => Math.max(a, b), 0);
     const bestBid = books.data ? books.map((book) => book.data.bids[0][1]).reduce((a, b) => Math.max(a, b), 0) : null;
     const bestAsk = books.data ? books.map((book) => book.data.asks[0][1]).reduce((a, b) => Math.min(a, b), Infinity): null;
     return {

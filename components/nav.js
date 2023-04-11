@@ -1,4 +1,7 @@
 export const navStyle = `
+    .navbar {
+        --bs-bg-opacity: 0.8;
+    }
 `;
 
 const nav = (() => {

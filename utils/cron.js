@@ -6,7 +6,9 @@ import { getStocks } from '../jobs/stocks.js';
 import books from '../jobs/books.js';
 import options from '../jobs/options.js';
 import quotes from '../jobs/quotes.js';
-import { atrIvChart } from '../jobs/catalyst.js';
+import advDec from '../jobs/advDec.js';
+import { prediction } from './index.js'
+import { mfiRsiChart } from '../jobs/catalyst.js';
 
 dotenv.config();
 
@@ -21,6 +23,7 @@ const log = console.log;
 log(chalk.blue('Getting stocks...'));
 const _stocks = await getStocks();
 
+const advDecData = await advDec();
 const createDoc = async (stock) => {
     log(chalk.blue(`Creating document for ${stock.ticker}...`));
     log(chalk.blue(`...Getting books for ${stock.ticker}...`));
@@ -32,7 +35,7 @@ const createDoc = async (stock) => {
 
     const { company, sector } = stock;
     const { bidVolume, askVolume, bidDollars, askDollars } = bookData;
-    const { iv, occ, openInterest, averageOI, delta, theta, bidPrice, askPrice } = optionsData;
+    const { iv, occ, openInterest, averageOI, delta, theta, bidPrice, askPrice, optionCallsOpenInterest, optionPutsOpenInterest } = optionsData;
     const { close, volume, rsi } = quoteData;
 
     const doc = {
@@ -40,7 +43,7 @@ const createDoc = async (stock) => {
         company: company,
         sector: sector,
         chart: close,
-        atrIvChart: await atrIvChart(stock.ticker),
+        mfiRsi: await mfiRsiChart(stock.ticker),
         close: close.pop(),
         yesterdaysClose: close[close.length - 2],
         volume: volume,
@@ -57,6 +60,8 @@ const createDoc = async (stock) => {
         theta: theta,
         bidPrice: bidPrice,
         askPrice: askPrice,
+        optionCallsOpenInterest: optionCallsOpenInterest,
+        optionPutsOpenInterest: optionPutsOpenInterest,
         iv: iv,
         lastUpdated: new Date()
     }
@@ -64,12 +69,13 @@ const createDoc = async (stock) => {
 }
 
 const firstCronRun = async () => {
-    stocksCollection.deleteMany({});
-    stocksCollection.findOneAndDelete({ ticker: { $nin: _stocks.map(stock => (stock.ticker)) } });
+    await stocksCollection.deleteMany({});
+    //stocksCollection.findOneAndDelete({ ticker: { $nin: _stocks.map(stock => (stock.ticker)) } });
+    await stocksCollection.replaceOne({ advancersDecliners: { $exists: true || false } }, { advancersDecliners: advDecData }, { upsert: true });
     for (const stock of _stocks) {
         const { ticker } = stock;
         const doc = await createDoc(stock);
-        stocksCollection.replaceOne({ ticker: ticker }, doc, { upsert: true });
+        await stocksCollection.replaceOne({ ticker: ticker }, doc, { upsert: true });
         log(chalk.green.italic('added/updated', ticker))
     }
     return true;
